@@ -5,33 +5,78 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import mysql.connector
+import MySQLCredentials as mc
+import datetime
+import logging
 
-#AshishSQL100@2020
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="ashish",
-  password="AshishSQL100@2020",
-  database="mydatabase",
-  auth_plugin='mysql_native_password'
-)
+logs = logging.getLogger()
+#from oauth2client.service_account import ServiceAccountCredentials
 
-mycursor = mydb.cursor(buffered=True)
-
-sql = "INSERT INTO Persons (FirstName, Address) VALUES (%s, %s)"
-val = ("John", "Highway 21")
-mycursor.execute(sql, val)
-
-mydb.commit()
-
-print(mycursor.rowcount, "record inserted.")
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
-# The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '1QZdFqcIPacozq22JgdwjP2vQoKSB4-cFIuiFQTl-ubM'
-SAMPLE_RANGE_NAME = 'A1:E9'
+def insertDataToSQL(data, sql_statement, TableName):
+    connection = mysql.connector.connect(
+        user = mc.user,
+        password = mc.password,
+        host = mc.host,
+        database = mc.database,
+        auth_plugin='mysql_native_password'
+        ) 
+    connection.autocommit = True
+    cursor = connection.cursor(buffered=True)
+    
+    f = open("lastRow.txt", "r+")
+    x = int(f.read())
+    f.close()
+    rown = x   
+    for i in range(len(data)):   
+        insert_data = sql_statement.format(TableName)
+        cursor.execute("SELECT COUNT(*) FROM {};".format(TableName))
+        RowCount = cursor.fetchone()[0]
+        print("Total Rows Now in the SQL Table is:", RowCount)
+        if i >= x:
+            cursor.execute(insert_data, data[i])
+            rown += 1
+    f = open("lastRow.txt", "w")
+    f.write(str(rown))
+    f.close()
+    
+    if connection.is_connected():
+        cursor.close()
+        connection.close()
+        logs.info('MySQL connection is closed.')
+    
 
-def main():
+
+def createSQLTable(TableName, sql_statement):
+    connection = mysql.connector.connect(
+        user = mc.user,
+        password = mc.password,
+        host = mc.host,
+        database = mc.database,
+        auth_plugin='mysql_native_password'
+        ) 
+    connection.autocommit = True
+    cursor = connection.cursor(buffered=True)
+    
+    try:
+        sql_create_table = sql_statement.format(TableName)
+        cursor.execute(sql_create_table)
+    except mysql.connector.ProgrammingError as e:
+        print(e)
+        logs.info(e)
+    #connection.commit()
+    if connection.is_connected():
+        cursor.close()
+        connection.close()
+        logs.info('MySQL connection is closed.')
+    
+
+
+
+
+def getData():
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
@@ -58,27 +103,76 @@ def main():
 
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
-                                range=SAMPLE_RANGE_NAME).execute()
+    result = sheet.values().get(spreadsheetId= mc.SAMPLE_SPREADSHEET_ID,
+                                range= mc.SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
+    for value in values[1:]:
+        #print(value[0])
+        #value[0] = value[0].replace('/', '-')
+        value[0] = datetime.datetime.strptime(value[0], '%d/%m/%Y %H:%M:%S')
+        userScore = value[1][0]
+        FullScore = value[1][-2:]
+        #print(value)
+        #print(userScore, FullScore)
+        del(value[1])
+        value.insert(1,FullScore)
+        value.insert(1,userScore)
+        if len(value) == 8:
+            value.append("")
+        value = tuple(value)
+        #print(value)
 
     if not values:
-        print('No data found.')
+        #print('No data found.')
+        return None
     else:
-        for row in values[1:]:
-            # Insert the data into the SQL table lindata
-            sql = "INSERT INTO lindata (ClientId, AvgTickets, NumEmployees, VoContract, Industry) VALUES (%s, %s, %s, %s, %s)" 
-            val = (row[0], row[1], row[2], row[3], row[4])
-            mycursor.execute(sql, val)
+        #print(values[0])
+        return values[1:]
 
-            mydb.commit()
 
-            print(mycursor.rowcount, "record inserted.")
-            
+def main():
+    data = getData()
+    sql_insert_statement = """INSERT INTO {}( 
+            TimeStamp,
+            UserScore,
+            FullScore,
+            Name,
+            School,
+            Block,
+            District,
+            PhoneNo,
+            IsInstalledApp
+            )
+            VALUES ( %s,%s,%s,%s,%s,%s,%s,%s,%s );"""
+    
+    sql_create_table = """CREATE TABLE {}( 
+            TimeStamp DATETIME,
+            UserScore VARCHAR(10),
+            FullScore VARCHAR(10),
+            Name VARCHAR(100),
+            School VARCHAR(100),
+            Block VARCHAR(100),
+            District VARCHAR(100),
+            PhoneNo VARCHAR(13),
+            IsInstalledApp VARCHAR(10)
+            );"""
+    createSQLTable("exam", sql_create_table)
+    insertDataToSQL(data, sql_insert_statement, "exam")
+
+           
             
 if __name__ == "__main__":
     main()
-    mycursor.execute("select * from lindata")
-    myresult = mycursor.fetchall()
+    connection = mysql.connector.connect(
+        user = mc.user,
+        password = mc.password,
+        host = mc.host,
+        database = mc.database,
+        auth_plugin='mysql_native_password'
+        ) 
+    connection.autocommit = True
+    cursor = connection.cursor(buffered=True)
+    cursor.execute("select * from exam")
+    myresult = cursor.fetchall()
     for x in myresult:
         print(x)
