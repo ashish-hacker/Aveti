@@ -10,6 +10,7 @@ Before running the commands below make sure you have all requirements satisfied 
 
 
 ## To pass the Sheet ID and the Range for data transfer to the SQL Table
+If you want to pass a new sheet url than your previous run , set the number in `lastRow.txt` to 0, so that the script will read from row number 0.
 To get the sheetID and and the Range to be scraped , You can directly pass the URL to the sheet and after the URL specifying the Range after a ',' to the ``sql.py``. Example below:
 ``python3 sql.py "[URL to the sheet],[range]"``
 
