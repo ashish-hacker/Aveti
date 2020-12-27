@@ -10,10 +10,10 @@ Before running the commands below make sure you have all requirements satisfied 
 
 
 ## To pass the Sheet ID and the Range for data transfer to the SQL Table
-To get the sheetID and and the Range to be scraped , You can directly pass the URL to the sheet and after the URL specifying the Range after a ',' to the ``MySQLCredentials.py``. Example below:
-``python3 MySQLCredentials.py "[URL to the sheet],[range]"``
+To get the sheetID and and the Range to be scraped , You can directly pass the URL to the sheet and after the URL specifying the Range after a ',' to the ``sql.py``. Example below:
+``python3 sql.py "[URL to the sheet],[range]"``
 
-For details about the code you can check ``MySQLCredentials.py`` file.
+For details about the code you can check ``sql.py`` file.
 
 ## Data Transfer from Google Sheets to SQL Table
 

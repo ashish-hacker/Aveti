@@ -8,9 +8,19 @@ import mysql.connector
 import MySQLCredentials as mc
 import datetime
 import logging
+import sys
+import re
 
 logs = logging.getLogger()
 #from oauth2client.service_account import ServiceAccountCredentials
+#url = https://docs.google.com/spreadsheets/d/           1gJKZmIuckbdHhGDJ7xqokvmDexNYdlpEU6gZxs-ajdw/edit#gid=0
+# The ID and range of a sample spreadsheet.
+url_range = sys.argv[1]
+url, ranges = url_range.split(",")
+url_array = url.split("/")
+SAMPLE_SPREADSHEET_ID = url_array[5]
+SAMPLE_RANGE_NAME = ranges
+
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -21,7 +31,7 @@ def insertDataToSQL(data, sql_statement, TableName):
         password = mc.password,
         host = mc.host,
         database = mc.database,
-        auth_plugin='mysql_native_password'
+        #auth_plugin='mysql_native_password'
         ) 
     connection.autocommit = True
     cursor = connection.cursor(buffered=True)
@@ -55,7 +65,7 @@ def createSQLTable(TableName, sql_statement):
         password = mc.password,
         host = mc.host,
         database = mc.database,
-        auth_plugin='mysql_native_password'
+        #auth_plugin='mysql_native_password'
         ) 
     connection.autocommit = True
     cursor = connection.cursor(buffered=True)
@@ -103,8 +113,8 @@ def getData():
 
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId= mc.SAMPLE_SPREADSHEET_ID,
-                                range= mc.SAMPLE_RANGE_NAME).execute()
+    result = sheet.values().get(spreadsheetId= SAMPLE_SPREADSHEET_ID,
+                                range= SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
     for value in values[1:]:
         #print(value[0])
@@ -168,7 +178,7 @@ if __name__ == "__main__":
         password = mc.password,
         host = mc.host,
         database = mc.database,
-        auth_plugin='mysql_native_password'
+        #auth_plugin='mysql_native_password'
         ) 
     connection.autocommit = True
     cursor = connection.cursor(buffered=True)
