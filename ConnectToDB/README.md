@@ -12,7 +12,11 @@ Before running the commands below make sure you have all requirements satisfied 
 ## To pass the Sheet ID and the Range for data transfer to the SQL Table
 If you want to pass a new sheet URL than your previous run , set the number in `lastRow.txt` to 0, so that the script will read from row number 0.
 To get the sheetID and and the Range to be scraped , You can directly pass the URL to the sheet and after the URL specifying the Range after a ',' to the ``sql.py``. Example below:
-``python3 sql.py "[URL to the sheet],[range]"``
+``python3 sql.py "[URL to the sheet],[range]"
+
+  python3 sqlpy "https://docs.google.com/spreadsheets/d/1gJKZmIuckbdHhGDJ7xqokvmDasSfGShHDh6gZxs-ajke/edit#gid=0,A1:H100"
+``
+The above code will transfer first 99 data rows from Google sheet of the specified URL to the SQL Table.
 
 For details about the code you can check ``sql.py`` file.
 
