@@ -25,7 +25,7 @@ For details about the code you can check ``sql.py`` file.
 Table create SQL statement, Insert SQL statement and Table Name is specified in the `sql.py` file.
 
 To transfer the data you need to execute the following command:
-``python3 sql.py "[URL to the sheet],[range]``
+``python3 sql.py "[URL to the sheet],[range]"``
 
 This will check if the Table is created in the SQL server, If not it will create the table with specified name. 
 Then it keeps track of the row numbers inserted to the SQL Table in `lastRow.txt` file, and then it keeps on updating the last row number inserted to the table. This is to confirm that no rows are inserted more than once.
