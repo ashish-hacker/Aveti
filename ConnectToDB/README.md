@@ -14,7 +14,7 @@ If you want to pass a new sheet URL than your previous run , set the number in `
 To get the sheetID and and the Range to be scraped , You can directly pass the URL to the sheet and after the URL specifying the Range after a ',' to the ``sql.py``. Example below:
 ``python3 sql.py "[URL to the sheet],[range]" ``
 
- `` python3 sqlpy "https://docs.google.com/spreadsheets/d/1gJKZmIuckbdHhGDJ7xqokvmDasSfGShHDh6gZxs-ajke/edit#gid=0,A1:H100"``
+ `` python3 sql.py "https://docs.google.com/spreadsheets/d/1gJKZmIuckbdHhGDJ7xqokvmDasSfGShHDh6gZxs-ajke/edit#gid=0,A1:H100"``
 
 The above code will transfer first 99 data rows from Google sheet of the specified URL to the SQL Table.
 
