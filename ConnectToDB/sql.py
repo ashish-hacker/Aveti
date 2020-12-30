@@ -119,7 +119,7 @@ def getData():
     for value in values[1:]:
         #print(value[0])
         #value[0] = value[0].replace('/', '-')
-        value[0] = datetime.datetime.strptime(value[0], '%d/%m/%Y %H:%M:%S')
+        value[0] = datetime.datetime.strptime(value[0], '%m/%d/%Y %H:%M:%S')
         userScore = value[1][0]
         FullScore = value[1][-2:]
         #print(value)
